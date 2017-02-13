@@ -30,7 +30,9 @@ app:shadowColor="@android:color/black"
 ```
 
 Screenshot:
-![https://raw.githubusercontent.com/venmo/tooltip-view/master/sample.png](https://raw.githubusercontent.com/venmo/tooltip-view/master/sample.png)
+
+![screenshot_1487012249](https://cloud.githubusercontent.com/assets/3880240/22898286/85eb1e74-f1db-11e6-9339-1892708a76ab.png)
+
 
 # Download
 ```groovy
