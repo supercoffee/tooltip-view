@@ -8,8 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
@@ -22,9 +20,6 @@ import android.widget.TextView;
 public class TooltipView extends TextView {
 
     private static final int NOT_PRESENT = Integer.MIN_VALUE;
-    private final int shadowStrokeWidth = 8;
-    private final int shadowOffsetX = 4;
-    private final int shadowOffsetY = 4;
     private int arrowHeight;
     private int arrowWidth;
     private int cornerRadius;
@@ -37,7 +32,8 @@ public class TooltipView extends TextView {
     private Paint paint;
     private Path tooltipPath;
     private final int blurRadius = 16;
-    private final Point measurements = new Point();
+    private Paint shadowPaint;
+    private BlurMaskFilter blur;
 
     public TooltipView(Context context) {
         super(context);
@@ -85,15 +81,7 @@ public class TooltipView extends TextView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//        Point dimensionsWithShadow = updateMeasurementsForShadow(getMeasuredWidth(),
-//                getMeasuredHeight() + arrowHeight);
         setMeasuredDimension(getMeasuredWidth(), getMeasuredHeight() + arrowHeight);
-    }
-
-    private Point updateMeasurementsForShadow(int measuredWidth, int measuredHeight) {
-        measurements.x = measuredWidth + shadowOffsetX + blurRadius;
-        measurements.y = measuredHeight + shadowOffsetY + blurRadius;
-        return measurements;
     }
 
     @Override
@@ -108,7 +96,7 @@ public class TooltipView extends TextView {
         if (tooltipPath == null || paint == null) {
             arrowLocation.configureDraw(this, canvas);
         }
-        drawShadow(tooltipPath, paint, canvas);
+        drawShadow(canvas);
         canvas.drawPath(tooltipPath, paint);
         super.onDraw(canvas);
     }
@@ -117,42 +105,19 @@ public class TooltipView extends TextView {
         return blurRadius;
     }
 
-    public int getShadowOffsetX() {
-        return shadowOffsetX;
-    }
+    private void drawShadow(Canvas canvas) {
+        if (blur == null) {
+            blur = new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL);
+        }
+        if (shadowPaint == null) {
+            shadowPaint = new Paint(paint);
+            shadowPaint.reset();
+            shadowPaint.setAntiAlias(true);
+            shadowPaint.setColor(Color.BLACK);
+            shadowPaint.setMaskFilter(blur);
+        }
 
-    public int getShadowOffsetY() {
-        return shadowOffsetY;
-    }
-
-    private void drawShadow(Path tooltipPath, Paint paint, Canvas canvas) {
-//        canvas.clipRect(updateRectForShadowSize(canvas.getClipBounds()));
-        canvas.save();
-        Rect clipBounds = canvas.getClipBounds();
-        clipBounds.top -= blurRadius;
-        clipBounds.bottom += blurRadius;
-        clipBounds.left -= blurRadius;
-        clipBounds.right += blurRadius;
-
-        BlurMaskFilter blur = new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL);
-        Paint shadowPaint = new Paint(paint);
-        Path shadowPath = new Path(tooltipPath);
-        shadowPath.offset(shadowOffsetX, shadowOffsetY);
-
-        shadowPaint.reset();
-        shadowPaint.setAntiAlias(true);
-        shadowPaint.setColor(Color.BLACK);
-        shadowPaint.setMaskFilter(blur);
-//        shadowPaint.setStyle(Paint.Style.STROKE);
-//        shadowPaint.setStrokeWidth(shadowStrokeWidth);
-
-        canvas.drawPath(shadowPath, shadowPaint);
-        canvas.restore();
-    }
-
-    private Rect updateRectForShadowSize(Rect clipBounds) {
-        clipBounds.inset(-blurRadius - shadowOffsetX, -blurRadius - shadowOffsetY);
-        return clipBounds;
+        canvas.drawPath(tooltipPath, shadowPaint);
     }
 
     Paint getTooltipPaint() {

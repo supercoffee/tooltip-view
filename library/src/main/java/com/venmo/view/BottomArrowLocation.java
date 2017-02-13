@@ -9,27 +9,36 @@ import static android.graphics.Path.Direction;
 
 class BottomArrowLocation implements ArrowLocation {
 
+    private Path basePath;
+
     @Override
     public void configureDraw(TooltipView view, Canvas canvas) {
-        view.setTooltipPath(new Path());
-        RectF rectF = new RectF(canvas.getClipBounds());
-        int offsetX = view.getShadowOffsetX() + view.getBlurRadius();
-        int offsetY = view.getShadowOffsetY() + view.getBlurRadius();
-        rectF.inset(offsetX, offsetY);
-        rectF.bottom -= view.getArrowHeight();
-        view.getTooltipPath()
-                .addRoundRect(rectF, view.getCornerRadius(), view.getCornerRadius(), Direction.CW);
-
-        float middle = ArrowAlignmentHelper.calculateArrowMidPoint(view, rectF);
-
-        view.getTooltipPath().moveTo(middle, view.getHeight());
-        int arrowDx = view.getArrowWidth() / 2;
-        view.getTooltipPath().lineTo(middle - arrowDx, rectF.bottom);
-        view.getTooltipPath().lineTo(middle + arrowDx, rectF.bottom);
-        view.getTooltipPath().close();
-        view.getTooltipPath().offset(offsetX / 2, offsetY / 2);
-
+        computeBasePath(view, canvas);
+        view.setTooltipPath(basePath);
         view.setPaint(new Paint(Paint.ANTI_ALIAS_FLAG));
         view.getTooltipPaint().setColor(view.getTooltipColor());
+    }
+
+    private Path computeBasePath(TooltipView view, Canvas canvas) {
+        if (basePath != null) {
+            return basePath;
+        }
+        basePath = new Path();
+        RectF pathBounds = new RectF(canvas.getClipBounds());
+        pathBounds.bottom -= view.getArrowHeight();
+
+        // Shrink the bounds by the blur radius so the shadow will fit inside the clipping bounds of the Canvas
+        pathBounds.inset(view.getBlurRadius(), view.getBlurRadius());
+
+        float middle = ArrowAlignmentHelper.calculateArrowMidPoint(view, pathBounds);
+        int arrowDx = view.getArrowWidth() / 2;
+
+        basePath.addRoundRect(pathBounds, view.getCornerRadius(), view.getCornerRadius(), Direction.CW);
+        basePath.moveTo(middle, view.getHeight() - view.getBlurRadius());
+        basePath.lineTo(middle - arrowDx, pathBounds.bottom);
+        basePath.lineTo(middle + arrowDx, pathBounds.bottom);
+        basePath.close();
+
+        return basePath;
     }
 }
