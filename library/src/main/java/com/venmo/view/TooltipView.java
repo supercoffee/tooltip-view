@@ -31,9 +31,10 @@ public class TooltipView extends TextView {
     private int arrowPositioning;
     private Paint paint;
     private Path tooltipPath;
-    private final int blurRadius = 16;
     private Paint shadowPaint;
     private BlurMaskFilter blur;
+    private @ColorInt int shadowColor;
+    private float shadowRadius;
 
     public TooltipView(Context context) {
         super(context);
@@ -72,6 +73,8 @@ public class TooltipView extends TextView {
                             R.integer.tooltip_default_arrow_alignment)));
             alignmentOffset = getDimension(a, R.styleable.TooltipView_arrowAlignmentOffset,
                     R.dimen.tooltip_default_offset);
+            shadowColor = a.getColor(R.styleable.TooltipView_shadowColor, Color.DKGRAY);
+            shadowRadius = a.getDimension(R.styleable.TooltipView_shadowRadius, 0);
         } finally {
             a.recycle();
         }
@@ -101,19 +104,19 @@ public class TooltipView extends TextView {
         super.onDraw(canvas);
     }
 
-    public int getBlurRadius() {
-        return blurRadius;
+    public float getToolipShadowRadius() {
+        return shadowRadius;
     }
 
     private void drawShadow(Canvas canvas) {
-        if (blur == null) {
-            blur = new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL);
+        if (blur == null && shadowRadius > 0) {
+            blur = new BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL);
         }
         if (shadowPaint == null) {
             shadowPaint = new Paint(paint);
             shadowPaint.reset();
             shadowPaint.setAntiAlias(true);
-            shadowPaint.setColor(Color.BLACK);
+            shadowPaint.setColor(shadowColor);
             shadowPaint.setMaskFilter(blur);
         }
 

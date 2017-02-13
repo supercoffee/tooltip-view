@@ -28,13 +28,13 @@ class BottomArrowLocation implements ArrowLocation {
         pathBounds.bottom -= view.getArrowHeight();
 
         // Shrink the bounds by the blur radius so the shadow will fit inside the clipping bounds of the Canvas
-        pathBounds.inset(view.getBlurRadius(), view.getBlurRadius());
+        pathBounds.inset(view.getToolipShadowRadius(), view.getToolipShadowRadius());
 
         float middle = ArrowAlignmentHelper.calculateArrowMidPoint(view, pathBounds);
         int arrowDx = view.getArrowWidth() / 2;
 
         basePath.addRoundRect(pathBounds, view.getCornerRadius(), view.getCornerRadius(), Direction.CW);
-        basePath.moveTo(middle, view.getHeight() - view.getBlurRadius());
+        basePath.moveTo(middle, view.getHeight() - view.getToolipShadowRadius());
         basePath.lineTo(middle - arrowDx, pathBounds.bottom);
         basePath.lineTo(middle + arrowDx, pathBounds.bottom);
         basePath.close();
