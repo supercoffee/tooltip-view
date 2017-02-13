@@ -19,7 +19,9 @@
         android:padding="8dp"
         android:gravity="center_horizontal"
         android:text="Don't get it?"
-        app:tooltipColor="#66009900"
+        app:tooltipColor="#009900"
+        app:shadowColor="@android:color/darker_gray"
+        app:shadowRadius="4dp"
         app:anchoredView="@id/header_1" />
 
     <TextView

@@ -16,6 +16,7 @@ A dead simple way to to add tooltips to your Android app.
 ```
 
 Here are the attribute options:
+
 ```
 app:tooltipColor="#66009900"
 app:anchoredView="@id/anchored_view"
@@ -24,6 +25,8 @@ app:arrowHeight="120dp"
 app:cornerRadius="16dp"
 app:arrowOffset="30dp"
 app:arrowAlignment="right"
+app:shadowRadius="4dp"
+app:shadowColor="@android:color/black"
 ```
 
 Screenshot:
@@ -31,7 +34,7 @@ Screenshot:
 
 # Download
 ```groovy
-compile 'com.venmo.view.tooltip:tooltip:0.1.2@aar'
+    compile 'com.github.supercoffee:tooltip-view:0a1a2d311@aar'
 ```
 
 ## TODO
